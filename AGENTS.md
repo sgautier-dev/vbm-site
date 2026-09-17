@@ -14,40 +14,51 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 This repository contains the new website for **Fundación Vivir un Buen Morir (VBM)**, replacing the current WordPress site at `vivirunbuenmorir.es`.
 
-The goal is a simpler, more contemporary, more readable and more robust site while preserving VBM's institutional and human voice. Modernize the structure, presentation and maintenance model without turning VBM into a generic wellness, coaching or lifestyle brand.
+The goal is a simpler, more contemporary, readable and robust website while preserving VBM's institutional and human voice.
 
-The project is independent from ZenCare. ZenCare remains a separate site at `zencare.es`.
+**Core principle: modernize the structure and design; keep the VBM voice.**
 
-## Read project documentation first
+ZenCare remains a separate site and repository at `zencare.es`. VBM contains only a short bridge page and relevant external CTAs.
 
-Before making project-level changes, read the relevant documents in this order:
+## Source of truth
 
-1. `docs/PROJECT_BRIEF.md`
-2. `docs/SITE_STRUCTURE.md`
-3. `docs/DESIGN_SYSTEM.md`
-4. `docs/CONTENT_MODEL.md`
-5. copy drafts under `docs/content/` when they are present for the pages being implemented
-6. `docs/SEO_STRATEGY.md`
-7. `docs/REDIRECT_MAP.md`
+Before project-level changes, read:
 
-If documents conflict:
+1. `docs/README.md`
+2. `docs/PROJECT_BRIEF.md`
+3. `docs/SITE_STRUCTURE.md`
+4. `docs/DESIGN_SYSTEM.md`
+5. `docs/CONTENT_MODEL.md`
+6. `docs/IMPLEMENTATION_CONTRACTS.md`
+7. `docs/SEO_STRATEGY.md`
+8. `docs/REDIRECT_MAP.md`
+9. `docs/MAISON_KAILASH_REUSE.md` when implementing shared UI patterns
+
+For page copy, use only the approved copy explicitly provided in the task or an approved repo-safe copy snapshot. Working drafts and client validation notes are not automatically publishable.
+
+If sources conflict:
 
 - `PROJECT_BRIEF.md` defines scope and non-goals.
 - `CONTENT_MODEL.md` defines what belongs in Sanity.
-- page copy drafts define wording.
-- `DESIGN_SYSTEM.md` defines the visual system.
-- `SEO_STRATEGY.md` and `REDIRECT_MAP.md` define migration and route constraints.
-- an explicit task instruction from Sébastien overrides an older planning document when the conflict is deliberate and clear.
+- `IMPLEMENTATION_CONTRACTS.md` defines runtime behavior and fallbacks.
+- approved page copy defines wording.
+- `DESIGN_SYSTEM.md` defines visual implementation.
+- `SEO_STRATEGY.md` and `REDIRECT_MAP.md` define route/migration constraints.
+- an explicit task instruction from Sébastien overrides an older planning decision when the conflict is deliberate and clear.
 
-Do not treat the old WordPress site as the source of truth when project documents contain a newer decision.
+Do not treat the old WordPress/Joomla sites as current truth when the consolidated repo docs contain a newer decision.
 
-## VBM voice: absolute rule
+## Language
 
-**The structure and design are modernized; the voice remains VBM.**
+- Visible website content: Spanish.
+- Code, code comments, commit messages and technical repo documentation: English.
+- Do not rewrite approved VBM copy unless the task explicitly asks for copy editing.
 
-Do not rewrite VBM copy into generic marketing, wellness, coaching or self-development language.
+## VBM voice
 
-Preserve VBM terminology and concepts when present in approved copy, including:
+Do not turn VBM into a generic wellness, coaching, lifestyle or self-development brand.
+
+Preserve VBM terminology when it appears in approved copy, including:
 
 - `buen morir`
 - `acompañamiento de calidad`
@@ -62,163 +73,234 @@ Preserve VBM terminology and concepts when present in approved copy, including:
 - `bioética`
 - `final de vida`
 
-Only rewrite site copy when the task explicitly asks for copy changes. Prefer shortening, clarifying and deduplicating over stylistic reinvention.
-
-Visible site content is Spanish. Code, comments, commit messages and technical documentation are English.
+Prefer shortening, clarifying and deduplicating over stylistic reinvention.
 
 ## Never invent current facts
 
-Never invent or infer missing prices, dates, schedules, registration links, accreditations, certification conditions, current care services, team members, partners, impact figures, medical or therapeutic guarantees, or external providers.
+Never invent or infer missing:
 
-If a value is not confirmed, use an explicit development TODO, hide the optional feature, use a neutral fallback, or ask for confirmation. Never fill a gap with a plausible value.
+- prices or payment conditions
+- dates or schedules
+- registration links
+- accreditations
+- diploma/certification conditions
+- current care services
+- current team/professorado
+- partners
+- impact figures
+- current donation/member conditions
+- medical or therapeutic guarantees
+- form, newsletter or payment providers
+
+If a value is not confirmed, omit it from publishable UI, use a development TODO, or request confirmation. Never fill gaps with plausible values.
 
 ## Stack
 
 - Next.js 16.3.x, App Router
 - React 19
-- TypeScript
+- TypeScript strict
 - Tailwind CSS v4
-- Sanity for intentionally limited, perishable content only
-- Vercel deployment
+- Sanity only for the intentionally limited dynamic scope
+- Vercel
 - npm
 
-Before using a Next.js API, follow the generated Next.js agent rule at the top of this file and inspect the local Next.js docs when relevant.
+Do not upgrade the framework or add experimental features as part of an unrelated batch.
+
+Before using a Next.js API, follow the generated Next.js rule at the top of this file and inspect the local Next.js documentation when relevant.
 
 ## Architecture
 
-- Use Server Components by default.
-- Add `"use client"` only when browser interaction requires it.
-- Prefer native platform and Next.js capabilities over heavy dependencies.
-- Build reusable components for stable patterns, but avoid premature abstraction.
-- Do not create a page builder or generic block CMS.
-- Do not create a monorepo with ZenCare.
-- Keep permanent editorial content versioned in the repository.
-- Keep design tokens centralized rather than hardcoding brand colors throughout components.
+- Server Components by default.
+- Add `"use client"` only where browser interaction actually requires it.
+- Prefer platform/Next.js capabilities over heavy dependencies.
+- Reuse stable patterns, but avoid premature abstraction.
+- No monorepo with ZenCare.
+- No generic page builder.
+- No generic editorial block system.
+- Permanent editorial content remains versioned in code.
+- Centralize design tokens; do not hardcode brand colors repeatedly.
+- Static navigation: never fetch navigation from Sanity.
 
-## Sanity: intentionally minimal
+## Sanity V1 boundary
 
-Sanity is a small operational back office for Mar, not the site-wide editorial engine.
-
-V1 editable types only:
+Exactly three visible editorial entries in V1:
 
 - `trainingPresencial` — singleton
 - `trainingOnline` — singleton
-- `event` — collection for agenda/activities
+- `event` — agenda/activity collection
 
-Do not add new Sanity document types without explicit approval.
+Do not add an announcement/banner document type in V1.
 
-Do not move institutional copy, navigation, footer, team/professorado, page structure, primary imagery, design tokens, structural SEO, module titles/descriptions, testimonials or resources into Sanity in V1 unless a later decision explicitly changes the scope.
+Do not add new document types without explicit approval.
 
-The Studio UI must be simple and Spanish, with non-technical labels and help text. Hide unnecessary technical fields from Mar.
+Do not place these in Sanity in V1:
 
-The frontend must degrade cleanly when Sanity is unavailable or optional fields are missing. Never render `undefined`, raw empty fields or technical placeholders in production.
+- institutional copy
+- navigation
+- footer
+- team/professorado
+- primary imagery
+- design tokens
+- page composition
+- structural SEO
+- module titles/descriptions
+- testimonials/resources unless a later explicit decision changes the scope
 
-## Events
+The Studio must be simple and Spanish. Hide unnecessary technical fields and generic singleton creation UI.
 
-The homepage displays only future or ongoing events.
+## Runtime and fallbacks
 
-Use `endDate` when present to determine whether an event is still current; otherwise use `startDate`.
+Follow `docs/IMPLEMENTATION_CONTRACTS.md`.
 
-Past events must disappear automatically from homepage listings, but must not be deleted automatically from Sanity.
+The site must distinguish:
 
-Event cards must work without an image field.
+1. data source not configured,
+2. data source temporarily unavailable,
+3. configured and available but with no current items.
 
-## Training data
+Do not show stale invented fallback dates/prices as if they were current.
 
-Presencial and Online share stable editorial structure, but their variable edition data comes from separate Sanity singletons.
+Optional data should be omitted cleanly. Never render `undefined`, raw empty fields or technical placeholders in production.
 
-Do not duplicate Sanity-controlled prices, dates or registration state manually in code.
+## Assets and privacy
 
-Do not import old editions into the main current-edition UI unless an explicit archive is requested.
+Use only approved assets for the role they were approved for.
 
-## Assets
+Status semantics:
 
-Use only approved VBM assets according to the project asset manifest when it is available in the task context.
-
-- `KEEP` / `KEEP WITH RETOUCH`: usable according to the assigned role.
-- `SECONDARY`: do not use as a hero.
-- `ARCHIVE`: historical use only.
+- `KEEP` / `KEEP WITH RETOUCH`: usable for the assigned role.
+- `SECONDARY`: never a hero.
+- `ARCHIVE`: historical only.
 - `DO NOT USE`: never publish.
 - `CONSENT NEEDED`, `HOLD`, `CONSENT REQUIRED`: never publish without explicit confirmation.
 
-Do not choose final production imagery from legacy folders based only on filenames.
+Use official logo files only. Never recreate, trace, stylize or generate the VBM logo with AI.
 
-Use only official logo files. Never recreate, trace, stylize or generate the VBM logo with AI.
+This repository is public. Do not commit private Drive links, consent records, client correspondence, unpublished personal data, secrets or source assets whose redistribution rights have not been confirmed.
 
-If the asset manifest or an approved production asset is not available in the current coding task, do not invent a final asset choice. Build the layout so the approved asset can be inserted later.
+Approval for website publication does not automatically mean approval for redistribution in a public Git repository.
 
-## Design direction
+## Design
 
 Follow `docs/DESIGN_SYSTEM.md`.
 
-The result should feel contemporary, editorial, human, calm, credible, warm without becoming sentimental, and serious without becoming heavy or clinical.
+The result should feel contemporary, editorial, human, calm, credible and serious without being heavy or clinical.
 
-Avoid generic wellness aesthetics, dense association-style galleries, unnecessary gradients, glassmorphism, heavy shadows, decorative overload and spectacular motion.
+Avoid:
 
-VBM brand colors are accents, not permanent full-page fills.
+- generic wellness styling
+- dense association-style photo galleries
+- unnecessary gradients
+- glassmorphism
+- heavy shadows
+- decorative overload
+- spectacular motion
+- oversized startup-style typography
 
-Use the documented Figtree + Cormorant SC typography system. Cormorant SC is an editorial accent, not the default heading font for every element.
+Use brand colors as accents, not constant full-surface fills.
 
-## Components
+Use Figtree as the functional/body family and Cormorant SC selectively as an editorial accent.
 
-Create a shared component only when it serves multiple pages or stabilizes a meaningful visual/interaction pattern. Expected patterns may include Header/MobileMenu, Footer, Container, Section, SectionHeading, Button, Hero, SplitSection, PillarCard, TrainingCard, EventCard, ResourceCard, PersonCard, ImpactMetric, ModuleAccordion, RetreatInfo, TrainingEditionPanel, ZenCareBridge, ContactCTA and Breadcrumbs.
+## Maison Kailash reference
 
-Do not create a large generic design-system abstraction layer merely because these names exist in planning documents. Implement patterns as the real pages require them.
+Use `docs/MAISON_KAILASH_REUSE.md`.
+
+Maison Kailash is a tested implementation reference, not a template to copy blindly.
+
+Reuse/adapt structural and interaction patterns where they reduce work. Never import Maison Kailash branding, copy, contact details, production configuration, Sanity schemas, newsletter/forms or secrets.
 
 ## Accessibility
 
-Target WCAG AA as a minimum: semantic HTML, keyboard navigation, visible focus states, sufficient contrast, explicit form labels, accessible accordions and menus, meaningful alt text, practical 44px touch targets, `prefers-reduced-motion`, and no essential text baked into images.
+Target WCAG AA minimum.
+
+Required:
+
+- semantic HTML
+- complete keyboard operation
+- visible focus
+- sufficient contrast
+- explicit labels
+- accessible mobile navigation and accordions
+- meaningful alt text
+- practical ~44px touch targets
+- `prefers-reduced-motion`
+- no essential text embedded only in images
+
+Do not use the raw VBM brand magenta with white body-sized text for a primary action if the combination fails contrast. Use the documented functional action token.
 
 ## SEO and routes
 
 Follow `docs/SEO_STRATEGY.md` and `docs/REDIRECT_MAP.md`.
 
-Always account for page-specific metadata, absolute canonical URLs, sitemap, robots rules, breadcrumbs on deep pages, permanent 301 redirects for confirmed migrations, no `/page/n/` duplication, and no indexable previews or staging routes.
+Use the repo's trailing-slash route convention consistently.
 
-Do not redirect unrelated legacy content to the homepage just to avoid a 404. When changing a route, check the redirect map first.
+When changing routes, check the redirect map first.
+
+Do not redirect unrelated legacy content to the homepage merely to avoid a 404.
+
+Do not assume a legacy redirect is ready merely because the source URL was verified. The destination content/anchor must exist and the redirect must be tested.
 
 ## Performance
 
-Use `next/image` where appropriate, provide sensible dimensions and `sizes`, avoid unnecessarily large source images, lazy-load below-the-fold media, use Next.js font optimization, minimize client JavaScript, and avoid heavy carousels and autoplay hero video by default.
+- Use `next/image` when appropriate.
+- Provide explicit responsive `sizes`.
+- Avoid unnecessarily large source files.
+- Lazy-load below-the-fold media.
+- Use Next.js font optimization.
+- Minimize client JavaScript.
+- Avoid heavy carousels and autoplay hero video.
+- Do not add animation libraries unless a real requirement justifies them.
 
 ## Forms, payments and newsletter
 
-These integrations are TBD until explicitly confirmed. Do not add Stripe, PayPal, Mailchimp, Brevo, Resend or another provider without instruction. Do not reproduce old WordPress forms as the default solution.
+These integrations remain out of scope until explicitly confirmed.
 
-## ZenCare boundary
+Do not add Stripe, PayPal, Mailchimp, Brevo, Resend, Arcjet or another service without instruction.
 
-ZenCare stays at `zencare.es` in a separate repository. This repository contains only the short `/zencare/` bridge page and relevant external CTAs. Do not duplicate ZenCare practices or internal pages into this project.
+Do not reproduce old WordPress forms by default.
 
 ## Historical content
 
-When migrating historical articles/resources, preserve original author and publication date when available, preserve meaningful old slugs via redirects, do not silently rewrite historical articles, do not present old information as current, and flag content requiring legal or medical verification before republication.
+When historical resources are migrated:
+
+- preserve original author/date when available
+- preserve meaningful legacy URLs with a suitable permanent redirect
+- do not silently rewrite historical articles
+- do not present old information as current
+- flag legal/medical content that requires verification before republication
 
 ## Working method
 
-Work in coherent, reasonably broad batches rather than tiny file-by-file tasks.
+Work in coherent batches.
 
-Planned implementation sequence:
+Planned sequence:
 
-1. bootstrap repository foundation, design tokens, global layout, header/footer and route skeleton
+1. repo foundation, tokens, global layout, header/footer, route skeleton, content contracts
 2. Home + Fundación
 3. Formación landing + Presencial + Online + Entidades + Retiros
 4. Sanity schemas + Studio + queries + agenda
 5. Acompañamiento + Recursos + ZenCare + Colabora + Contacto
-6. selected historical migration + SEO + redirects + legal pages
-7. responsive, accessibility, performance and content QA
+6. selected historical migration + SEO + redirects + legal
+7. cross-site responsive/accessibility/performance/content QA
+
+Accessibility, responsive behavior and error states are checked within every batch. Batch 7 is the final transverse audit, not the first QA pass.
 
 At the end of each batch:
 
 - run `npm run lint`
-- run `npx tsc --noEmit` until/unless a dedicated typecheck script is added
+- run `npx tsc --noEmit` until a dedicated typecheck script exists
 - run `npm run build`
-- fix all errors introduced by the batch
-- verify the routes and interactions touched
-- provide a short summary of changes and real remaining TODOs
+- fix errors introduced by the batch
+- verify touched routes/interactions
+- report changes and real TODOs briefly
 
 ## Git
 
-Prefer clear, scoped commits per coherent batch or sub-batch. Do not mix unrelated refactors with editorial changes. Do not modify generated files or critical config without a documented reason.
+Prefer clear commits per coherent batch/sub-batch.
+
+Do not mix unrelated refactors with editorial changes.
+
+Do not modify generated files or critical configuration without a reason.
 
 ## Final principle
 

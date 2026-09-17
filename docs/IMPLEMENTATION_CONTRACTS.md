@@ -1,0 +1,169 @@
+# VBM — Implementation Contracts
+
+Version: consolidated V1 — September 2026
+
+These rules convert planning language into deterministic runtime behavior.
+
+## 1. Event date semantics
+
+V1 stores agenda dates as civil dates (`YYYY-MM-DD`), not UTC timestamps.
+
+Business timezone for date boundaries: `Europe/Madrid`.
+
+If `endDate` exists:
+
+- the event is current through the end of `endDate`
+- it becomes past on the following local calendar day
+
+If `endDate` is absent:
+
+- the event remains current through the end of `startDate`
+
+`timeLabel` is display-only free text for an optional hour/schedule. Do not use it for automatic expiration logic.
+
+This avoids timezone-driven early disappearance while keeping Mar's editing workflow simple.
+
+## 2. Homepage event selection
+
+`featured` means **eligible for homepage**, not merely "ranking boost".
+
+Homepage query/render rule:
+
+1. exclude past events
+2. require `featured === true`
+3. sort by `startDate` ascending
+4. show up to 4
+
+Agenda page:
+
+1. upcoming/current events first, chronological
+2. recent past archive only if/when the page design enables it
+
+An event leaving the homepage must never be deleted automatically from Sanity.
+
+## 3. Dynamic-data freshness
+
+Time-dependent lists must not rely exclusively on a publish webhook.
+
+Use a caching/revalidation strategy that guarantees a page eventually recalculates after the local date changes even if nobody edits Sanity.
+
+The exact Next.js caching API must follow the installed Next.js 16.3 documentation.
+
+## 4. Sanity states
+
+UI must distinguish:
+
+### Not configured
+
+Development/build environment has no Sanity configuration.
+
+Expected behavior:
+
+- static site shell still builds where practical
+- dynamic sections are omitted or show an intentional non-production development state
+- no fake dates/prices
+
+### Temporarily unavailable
+
+Configuration exists but fetch fails.
+
+Expected behavior:
+
+- page remains usable
+- optional dynamic block is omitted or displays a neutral generic state
+- no stale invented "current" values
+- log/observability can record the failure without exposing technical details to visitors
+
+### Available but empty
+
+The request succeeded but there are no current items.
+
+Expected behavior:
+
+- "Próximas actividades" can be omitted or use approved generic empty-state copy
+- never show old events as a fallback
+
+## 5. Registration status
+
+Internal values:
+
+```text
+open   → Abierta
+soon   → Próximamente
+closed → Cerrada
+```
+
+Only show a registration CTA when a valid destination exists and the current status permits the intended action.
+
+Do not render a dead "Inscríbete" button with no URL.
+
+## 6. Training source of truth
+
+Current edition data comes from the corresponding singleton.
+
+Do not duplicate current dates/prices into static page data.
+
+Stable academic modules live in one static shared source used by Formación/Presencial/Online.
+
+## 7. Retreat data
+
+Presencial owns the editable current-edition retreat date/location objects in V1.
+
+Do not create a second independent copy of the same retreat dates elsewhere.
+
+Online retreat participation/dates remain a business-validation point. Do not model separate Online retreat dates until a real difference is confirmed.
+
+## 8. Publication status of copy
+
+Three distinct concepts:
+
+1. **approved wording** — agent should preserve wording
+2. **validated current fact** — safe to publish as current
+3. **working/internal note** — never publish
+
+A copy draft can contain approved-style wording and still mention facts awaiting validation.
+
+Do not strip an internal warning and publish the associated claim.
+
+## 9. Public repository boundary
+
+The GitHub repository is public.
+
+Allowed:
+
+- application code
+- repo-safe technical docs
+- final public copy
+- public-safe optimized assets when redistribution is permitted
+
+Keep outside Git:
+
+- private Drive URLs
+- raw consent records
+- patient/participant personal information
+- client correspondence
+- unvalidated private operational details
+- credentials/tokens
+- raw source assets whose public redistribution rights are uncertain
+
+Website publication approval and public-repository redistribution are separate checks.
+
+## 10. Route convention
+
+Use trailing slashes consistently.
+
+Configure Next.js rather than manually constructing inconsistent URL variants.
+
+## 11. QA is incremental
+
+Each batch checks:
+
+- mobile + desktop behavior
+- keyboard/focus for touched interactions
+- new contrast combinations
+- empty/error states
+- lint
+- typecheck
+- production build
+
+The final QA batch repeats these checks across the complete site.
