@@ -28,6 +28,10 @@ function isActivePath(pathname: string, href: NavigationItem["href"]) {
   return currentPath === targetPath || currentPath.startsWith(targetPath);
 }
 
+function isExactPath(pathname: string, href: NavigationItem["href"]) {
+  return normalizePath(pathname) === normalizePath(href);
+}
+
 export default function Header() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -65,7 +69,10 @@ export default function Header() {
             <Link
               href={collaborationLink.href}
               aria-current={
-                isActivePath(pathname, collaborationLink.href) ? "page" : undefined
+                isExactPath(pathname, collaborationLink.href) ? "page" : undefined
+              }
+              data-active={
+                isActivePath(pathname, collaborationLink.href) ? "true" : undefined
               }
               className="btn-primary"
             >
@@ -114,17 +121,19 @@ export default function Header() {
         <div className="mt-10 flex flex-col gap-2">
           {mainNavigation.map((item) => {
             const active = isActivePath(pathname, item.href);
+            const exact = isExactPath(pathname, item.href);
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                aria-current={active ? "page" : undefined}
+                aria-current={exact ? "page" : undefined}
+                data-active={active ? "true" : undefined}
                 onClick={closeMobileMenu}
                 className={
                   item.emphasis === "primary"
                     ? "btn-primary mt-4 justify-center"
-                    : "flex min-h-12 items-center rounded-control px-3 py-2 text-lg font-semibold text-foreground hover:bg-surface aria-[current=page]:bg-soft-magenta/45"
+                    : "flex min-h-12 items-center rounded-control px-3 py-2 text-lg font-semibold text-foreground hover:bg-surface data-[active=true]:bg-soft-magenta/45"
                 }
               >
                 {item.label}
@@ -161,11 +170,12 @@ function NavigationLink({
   pathname: string;
 }) {
   const active = isActivePath(pathname, item.href);
+  const exact = isExactPath(pathname, item.href);
 
   return (
     <Link
       href={item.href}
-      aria-current={active ? "page" : undefined}
+      aria-current={exact ? "page" : undefined}
       data-active={active ? "true" : undefined}
       className="nav-link"
     >
