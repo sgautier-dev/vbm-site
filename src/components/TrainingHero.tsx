@@ -1,9 +1,14 @@
-type TrainingHeroTone = "overview" | "presencial" | "online";
+type TrainingHeroTone =
+  | "overview"
+  | "presencial"
+  | "online"
+  | "entidades"
+  | "retiros";
 
 type TrainingHeroProps = {
   eyebrow: string;
   title: string;
-  body: string;
+  body: string | readonly string[];
   tone: TrainingHeroTone;
   cta?: {
     label: string;
@@ -57,6 +62,34 @@ const toneStyles: Record<
       "bg-brand-cyan",
     ],
   },
+  entidades: {
+    surface: "bg-soft-cyan/30",
+    frame: "border-brand-cyan",
+    bars: [
+      "bg-brand-cyan",
+      "bg-soft-cyan",
+      "bg-brand-magenta",
+      "bg-soft-gray",
+      "bg-brand-cyan",
+      "bg-brand-gray-lilac",
+      "bg-brand-yellow",
+      "bg-brand-cyan",
+    ],
+  },
+  retiros: {
+    surface: "bg-warm-sand/75",
+    frame: "border-brand-magenta",
+    bars: [
+      "bg-warm-sand",
+      "bg-brand-magenta",
+      "bg-soft-magenta",
+      "bg-brand-yellow",
+      "bg-soft-yellow",
+      "bg-brand-magenta",
+      "bg-brand-cyan",
+      "bg-soft-magenta",
+    ],
+  },
 };
 
 export default function TrainingHero({
@@ -67,6 +100,7 @@ export default function TrainingHero({
   cta,
 }: TrainingHeroProps) {
   const styles = toneStyles[tone];
+  const bodyParagraphs = typeof body === "string" ? [body] : body;
 
   return (
     <section
@@ -79,9 +113,13 @@ export default function TrainingHero({
           <h1 id="training-hero-title" className="heading-display mt-5">
             {title}
           </h1>
-          <p className={`mt-8 max-w-3xl border-l-4 pl-6 text-lead sm:pl-8 ${styles.frame}`}>
-            {body}
-          </p>
+          <div
+            className={`mt-8 max-w-3xl space-y-5 border-l-4 pl-6 text-lead sm:pl-8 ${styles.frame}`}
+          >
+            {bodyParagraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
           {cta ? (
             <a href={cta.href} className="btn-primary mt-9">
               {cta.label}
