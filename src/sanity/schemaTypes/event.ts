@@ -16,7 +16,8 @@ export const eventType = defineType({
   name: "event",
   title: "Agenda y actividades",
   type: "document",
-  description: "Los eventos pasados dejarán de aparecer en portada automáticamente.",
+  description:
+    "Conferencias, talleres, encuentros y otras actividades independientes de las ediciones de formación. Las actividades pasadas dejan de mostrarse automáticamente.",
   fields: [
     defineField({
       name: "title",

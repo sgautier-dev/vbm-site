@@ -11,6 +11,18 @@ const moduleDatesProjection = `{
   m8 { startDate, endDate }
 }`;
 
+const retreatProjection = `{
+  title,
+  startDate,
+  endDate,
+  timeLabel,
+  location,
+  excerpt,
+  externalUrl,
+  featured,
+  note
+}`;
+
 export const TRAINING_PRESENCIAL_QUERY = defineQuery(`
   *[
     _type == "trainingPresencial" &&
@@ -24,8 +36,8 @@ export const TRAINING_PRESENCIAL_QUERY = defineQuery(`
     locationSummary,
     scheduleNote,
     moduleDates ${moduleDatesProjection},
-    mainRetreat { startDate, endDate, location, note },
-    followUpRetreat { startDate, endDate, location, note },
+    mainRetreat ${retreatProjection},
+    followUpRetreat ${retreatProjection},
     importantNotice
   }
 `);
@@ -58,24 +70,21 @@ const eventProjection = `{
   featured
 }`;
 
-export const UPCOMING_EVENTS_QUERY = defineQuery(`
-  *[
-    _type == "event" &&
-    defined(startDate) &&
-    coalesce(endDate, startDate) >= $today
-  ]
-  | order(startDate asc, title asc, _id asc)
-  ${eventProjection}
-`);
-
-export const FEATURED_UPCOMING_EVENTS_QUERY = defineQuery(`
-  *[
-    _type == "event" &&
-    defined(startDate) &&
-    coalesce(endDate, startDate) >= $today &&
-    featured == true
-  ]
-  | order(startDate asc, title asc, _id asc)
-  [0...4]
-  ${eventProjection}
+export const PUBLIC_EVENTS_QUERY = defineQuery(`
+  {
+    "events": *[
+      _type == "event" &&
+      defined(startDate) &&
+      coalesce(endDate, startDate) >= $today
+    ]
+    | order(startDate asc, title asc, _id asc)
+    ${eventProjection},
+    "trainingPresencial": *[
+      _type == "trainingPresencial" &&
+      _id == $documentId
+    ][0] {
+      mainRetreat ${retreatProjection},
+      followUpRetreat ${retreatProjection}
+    }
+  }
 `);

@@ -2,7 +2,7 @@
 
 ## Scope
 
-Sanity V1 is a small operational back office for current training-edition data and agenda items. Permanent editorial copy, navigation, imagery, SEO and page composition remain in the repository.
+Sanity V1 is a small operational back office for current training-edition data and independent agenda items. Permanent editorial copy, navigation, imagery, SEO and page composition remain in the repository.
 
 The Studio exposes exactly three entries:
 
@@ -11,6 +11,13 @@ The Studio exposes exactly three entries:
 - `📅 Agenda y actividades` — collection type `event`
 
 The singleton entries open their canonical documents directly. Their create, duplicate and delete paths are removed from the normal Studio UI. Only Agenda behaves as a normal createable collection.
+
+Canonical ownership is intentionally explicit:
+
+- `trainingPresencial` owns the current edition, module dates and its main/follow-up retreats.
+- `event` owns conferences, workshops, meetings, independent retreats and other activities not attached to a training edition.
+
+Do not recreate a Presencial edition retreat in Agenda. When a Presencial retreat has a start date, public reads derive an event from it automatically; no additional Sanity document is required.
 
 ## Environment
 
@@ -29,7 +36,7 @@ Event queries compare ISO civil dates against the current calendar date in `Euro
 
 ## Public page integration
 
-The Batch 4B public integration is active. The Presencial and Online pages read their published singleton data, Agenda reads current and upcoming published events, and Home reads featured current and upcoming events. Permanent editorial content remains in code.
+The public integration is active. The Presencial and Online pages read their published singleton data. Agenda merges current/upcoming independent events with dated Presencial retreats. Home reads featured items from that same unified list, and the Retiros page shows its upcoming retreat subset. Permanent editorial content remains in code.
 
 Public pages remain functional without Sanity configuration: training pages omit operational edition details, Home keeps its generic Agenda bridge, and Agenda shows a neutral publication-pending state.
 

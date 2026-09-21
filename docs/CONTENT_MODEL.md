@@ -46,7 +46,12 @@ type DateRange = {
 }
 
 type RetreatEditionInfo = DateRange & {
+  title?: string
+  timeLabel?: string
   location?: string
+  excerpt?: string
+  externalUrl?: string
+  featured: boolean
   note?: string
 }
 
@@ -85,6 +90,8 @@ type TrainingPresencial = {
 Module titles and descriptions remain static in code.
 
 Do not add accreditation/diploma claims here as a workaround for unvalidated editorial facts.
+
+Presencial owns its current-edition retreats. A retreat with a confirmed start date is read as a public retreat event without creating a separate `event` document. Its `note` remains training-specific and is not used as the public event summary.
 
 ## `trainingOnline` singleton
 
@@ -153,6 +160,8 @@ Visible category labels in Spanish:
 
 V1 deliberately has no event image field.
 
+The `event` collection owns independent public activities only. Presencial edition retreats remain in `trainingPresencial`; editors must not duplicate them in Agenda. Independent retreats remain valid `event` documents with category `retreat`.
+
 ## Studio UX
 
 The Studio should open to a short custom structure, not a generic "Content" list.
@@ -166,7 +175,9 @@ Field labels/help text are Spanish and non-technical.
 Examples:
 
 - `Se mostrará automáticamente en la página de formación presencial.`
-- `Los eventos pasados dejarán de aparecer en portada automáticamente.`
+- `Conferencias, talleres, encuentros y otras actividades independientes de las ediciones de formación.`
+
+Retreat fields in Formación presencial explain that a dated retreat appears automatically in Agenda and can be highlighted on Home. Agenda explains that it is for activities independent of training editions.
 
 ## Validation
 

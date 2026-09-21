@@ -5,21 +5,21 @@ import type {
   TrainingPresencial,
 } from "@/lib/content";
 import {
-  adaptEvents,
+  mergeUpcomingEvents,
+  selectFeaturedUpcomingEvents,
+} from "@/lib/events";
+import {
+  adaptPublicEventSources,
   adaptTrainingOnline,
   adaptTrainingPresencial,
 } from "@/sanity/adapters";
 import { getSanityClient } from "@/sanity/client";
-import {
-  getMadridCivilDate,
-  isCurrentOrUpcomingEvent,
-} from "@/sanity/date";
+import { getMadridCivilDate } from "@/sanity/date";
 import { SANITY_REVALIDATE_SECONDS } from "@/sanity/env";
 import {
-  FEATURED_UPCOMING_EVENTS_QUERY,
+  PUBLIC_EVENTS_QUERY,
   TRAINING_ONLINE_QUERY,
   TRAINING_PRESENCIAL_QUERY,
-  UPCOMING_EVENTS_QUERY,
 } from "@/sanity/queries";
 import { SINGLETON_DOCUMENT_IDS } from "@/sanity/studio/singletons";
 
@@ -44,27 +44,42 @@ export async function getTrainingOnline(): Promise<
 }
 
 export async function getUpcomingEvents(): Promise<ContentResult<VbmEvent[]>> {
-  const today = getMadridCivilDate();
-
-  return fetchSanityContent(
-    UPCOMING_EVENTS_QUERY,
-    { today },
-    (value) => prepareEvents(value, today),
-  );
+  return getPublicEvents();
 }
 
 export async function getFeaturedUpcomingEvents(): Promise<
   ContentResult<VbmEvent[]>
 > {
+  const result = await getPublicEvents();
+
+  if (result.status !== "available") {
+    return result;
+  }
+
+  return {
+    status: "available",
+    data: selectFeaturedUpcomingEvents(result.data),
+  };
+}
+
+async function getPublicEvents(): Promise<ContentResult<VbmEvent[]>> {
   const today = getMadridCivilDate();
 
   return fetchSanityContent(
-    FEATURED_UPCOMING_EVENTS_QUERY,
-    { today },
-    (value) =>
-      prepareEvents(value, today)
-        .filter((event) => event.featured)
-        .slice(0, 4),
+    PUBLIC_EVENTS_QUERY,
+    {
+      today,
+      documentId: SINGLETON_DOCUMENT_IDS.trainingPresencial,
+    },
+    (value) => {
+      const sources = adaptPublicEventSources(value);
+
+      return mergeUpcomingEvents(
+        sources.independentEvents,
+        sources.trainingRetreats,
+        today,
+      );
+    },
   );
 }
 
@@ -89,16 +104,6 @@ async function fetchSanityContent<T>(
     logSanityRequestFailure(error);
     return { status: "unavailable" };
   }
-}
-
-function prepareEvents(value: unknown, today: string): VbmEvent[] {
-  return adaptEvents(value)
-    .filter((event) => isCurrentOrUpcomingEvent(event, today))
-    .sort(
-      (first, second) =>
-        first.startDate.localeCompare(second.startDate) ||
-        first.title.localeCompare(second.title, "es"),
-    );
 }
 
 function logSanityRequestFailure(error: unknown) {

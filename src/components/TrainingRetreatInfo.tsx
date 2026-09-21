@@ -15,7 +15,7 @@ export default function TrainingRetreatInfo({
     { label: "Retiro de seguimiento", data: followUpRetreat },
   ].filter(
     (retreat): retreat is { label: string; data: RetreatEditionInfo } =>
-      retreat.data !== undefined,
+      retreat.data !== undefined && hasPracticalDetails(retreat.data),
   );
 
   if (retreats.length === 0) {
@@ -29,7 +29,7 @@ export default function TrainingRetreatInfo({
         {retreats.map((retreat) => (
           <section key={retreat.label} aria-label={retreat.label}>
             <h3 className="text-lg font-semibold tracking-tight">
-              {retreat.label}
+              {retreat.data.title ?? retreat.label}
             </h3>
             <dl className="mt-4 space-y-3 text-sm">
               {retreat.data.startDate || retreat.data.endDate ? (
@@ -41,6 +41,12 @@ export default function TrainingRetreatInfo({
                       endDate={retreat.data.endDate}
                     />
                   </dd>
+                </div>
+              ) : null}
+              {retreat.data.timeLabel ? (
+                <div>
+                  <dt className="font-semibold text-muted">Horario</dt>
+                  <dd className="mt-1">{retreat.data.timeLabel}</dd>
                 </div>
               ) : null}
               {retreat.data.location ? (
@@ -60,5 +66,16 @@ export default function TrainingRetreatInfo({
         ))}
       </div>
     </div>
+  );
+}
+
+function hasPracticalDetails(retreat: RetreatEditionInfo): boolean {
+  return Boolean(
+    retreat.title ||
+      retreat.startDate ||
+      retreat.endDate ||
+      retreat.timeLabel ||
+      retreat.location ||
+      retreat.note,
   );
 }

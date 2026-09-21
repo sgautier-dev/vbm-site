@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import CivilDateRange from "@/components/CivilDateRange";
 import EditorialSectionHeading from "@/components/EditorialSectionHeading";
 import TrainingHero from "@/components/TrainingHero";
+import type { ContentResult, Event as VbmEvent } from "@/lib/content";
+import { getUpcomingEvents } from "@/sanity/data";
 
 export const metadata: Metadata = {
   title: "Retiros VBM",
@@ -25,7 +28,9 @@ const intendedFor = [
   "Personas que deseen realizar un trabajo personal de aproximación a la muerte, al sufrimiento y al duelo.",
 ] as const;
 
-export default function RetreatsPage() {
+export default async function RetreatsPage() {
+  const eventsResult = await getUpcomingEvents();
+
   return (
     <>
       <TrainingHero
@@ -133,6 +138,8 @@ export default function RetreatsPage() {
         </div>
       </section>
 
+      <UpcomingRetreats result={eventsResult} />
+
       <nav aria-label="Formación presencial" className="border-t border-border py-10 sm:py-12">
         <div className="section-container">
           <Link href="/formacion/presencial/" className="arrow-link">
@@ -142,5 +149,100 @@ export default function RetreatsPage() {
         </div>
       </nav>
     </>
+  );
+}
+
+function UpcomingRetreats({ result }: { result: ContentResult<VbmEvent[]> }) {
+  if (result.status === "not-configured") {
+    return null;
+  }
+
+  const retreats =
+    result.status === "available"
+      ? result.data.filter((event) => event.category === "retreat")
+      : [];
+
+  return (
+    <section aria-labelledby="upcoming-retreats-title" className="section-padding bg-surface">
+      <div className="section-container">
+        <EditorialSectionHeading
+          id="upcoming-retreats-title"
+          title="Próximos retiros"
+        />
+
+        {result.status === "unavailable" ? (
+          <p className="mt-8 max-w-2xl text-lead text-muted">
+            La información de los próximos retiros no está disponible temporalmente.
+          </p>
+        ) : retreats.length === 0 ? (
+          <p className="mt-8 max-w-2xl text-lead text-muted">
+            No hay próximos retiros publicados por el momento.
+          </p>
+        ) : (
+          <ol aria-label="Próximos retiros" className="mt-10 border-y border-border">
+            {retreats.map((retreat, index) => {
+              const titleId = `upcoming-retreat-${index + 1}`;
+
+              return (
+                <li
+                  key={`${retreat.startDate}-${retreat.title}-${index}`}
+                  className="border-b border-border last:border-b-0"
+                >
+                  <article
+                    aria-labelledby={titleId}
+                    className="grid gap-6 py-8 md:grid-cols-[minmax(12rem,3fr)_minmax(0,7fr)] md:gap-12 lg:gap-20"
+                  >
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        <CivilDateRange
+                          startDate={retreat.startDate}
+                          endDate={retreat.endDate}
+                        />
+                      </p>
+                      {retreat.timeLabel ? (
+                        <p className="mt-2 text-sm text-muted">
+                          <span className="font-semibold">Horario · </span>
+                          {retreat.timeLabel}
+                        </p>
+                      ) : null}
+                      {retreat.location ? (
+                        <p className="mt-2 text-sm text-muted">
+                          <span className="font-semibold">Lugar · </span>
+                          {retreat.location}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div>
+                      <h3
+                        id={titleId}
+                        className="text-xl font-semibold tracking-tight sm:text-2xl"
+                      >
+                        {retreat.title}
+                      </h3>
+                      {retreat.excerpt ? (
+                        <p className="mt-4 max-w-2xl text-muted">
+                          {retreat.excerpt}
+                        </p>
+                      ) : null}
+                      {retreat.externalUrl ? (
+                        <a
+                          href={retreat.externalUrl}
+                          className="arrow-link mt-5"
+                          aria-label={`Más información sobre ${retreat.title}`}
+                        >
+                          Más información
+                          <span aria-hidden="true">→</span>
+                        </a>
+                      ) : null}
+                    </div>
+                  </article>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </div>
+    </section>
   );
 }

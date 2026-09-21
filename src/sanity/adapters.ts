@@ -9,6 +9,7 @@ import {
   type TrainingModuleDates,
   type TrainingOnline,
   type TrainingPresencial,
+  type TrainingPresencialRetreats,
 } from "@/lib/content";
 import { isCivilDate } from "@/sanity/date";
 
@@ -22,14 +23,12 @@ export function adaptTrainingPresencial(
   }
 
   const locationSummary = optionalString(value.locationSummary);
-  const mainRetreat = adaptRetreat(value.mainRetreat);
-  const followUpRetreat = adaptRetreat(value.followUpRetreat);
+  const retreats = adaptTrainingPresencialRetreats(value);
 
   return {
     ...base,
+    ...retreats,
     ...(locationSummary ? { locationSummary } : {}),
-    ...(mainRetreat ? { mainRetreat } : {}),
-    ...(followUpRetreat ? { followUpRetreat } : {}),
   };
 }
 
@@ -43,6 +42,38 @@ export function adaptEvents(value: unknown): VbmEvent[] {
   }
 
   return value.map(adaptEvent).filter((event): event is VbmEvent => event !== null);
+}
+
+export function adaptPublicEventSources(value: unknown): {
+  independentEvents: VbmEvent[];
+  trainingRetreats: TrainingPresencialRetreats | null;
+} {
+  if (!isRecord(value)) {
+    return { independentEvents: [], trainingRetreats: null };
+  }
+
+  return {
+    independentEvents: adaptEvents(value.events),
+    trainingRetreats: adaptTrainingPresencialRetreats(
+      value.trainingPresencial,
+    ),
+  };
+}
+
+export function adaptTrainingPresencialRetreats(
+  value: unknown,
+): TrainingPresencialRetreats | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const mainRetreat = adaptRetreat(value.mainRetreat);
+  const followUpRetreat = adaptRetreat(value.followUpRetreat);
+
+  return {
+    ...(mainRetreat ? { mainRetreat } : {}),
+    ...(followUpRetreat ? { followUpRetreat } : {}),
+  };
 }
 
 function adaptTrainingEdition(value: unknown): TrainingOnline | null {
@@ -144,16 +175,38 @@ function adaptRetreat(value: unknown): RetreatEditionInfo | undefined {
   }
 
   const dateRange = adaptDateRange(value);
+  const title = optionalString(value.title);
+  const timeLabel = optionalString(value.timeLabel);
   const location = optionalString(value.location);
+  const excerptValue = optionalString(value.excerpt);
+  const excerpt =
+    excerptValue && excerptValue.length <= 320 ? excerptValue : undefined;
+  const externalUrl = optionalHttpUrl(value.externalUrl);
+  const featured = value.featured === true;
   const note = optionalString(value.note);
 
-  if (!dateRange.startDate && !dateRange.endDate && !location && !note) {
+  if (
+    !title &&
+    !dateRange.startDate &&
+    !dateRange.endDate &&
+    !timeLabel &&
+    !location &&
+    !excerpt &&
+    !externalUrl &&
+    !featured &&
+    !note
+  ) {
     return undefined;
   }
 
   return {
     ...dateRange,
+    featured,
+    ...(title ? { title } : {}),
+    ...(timeLabel ? { timeLabel } : {}),
     ...(location ? { location } : {}),
+    ...(excerpt ? { excerpt } : {}),
+    ...(externalUrl ? { externalUrl } : {}),
     ...(note ? { note } : {}),
   };
 }

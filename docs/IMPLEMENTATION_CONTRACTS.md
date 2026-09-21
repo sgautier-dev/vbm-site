@@ -29,10 +29,11 @@ This avoids timezone-driven early disappearance while keeping Mar's editing work
 
 Homepage query/render rule:
 
-1. exclude past events
-2. require `featured === true`
-3. sort by `startDate` ascending
-4. show up to 4
+1. merge independent Agenda events and derived Presencial retreats
+2. exclude past events
+3. require `featured === true`
+4. sort by `startDate` ascending
+5. show up to 4
 
 Agenda page:
 
@@ -83,6 +84,8 @@ Expected behavior:
 - "Próximas actividades" can be omitted or use approved generic empty-state copy
 - never show old events as a fallback
 
+A missing Presencial singleton does not make independent Agenda events unavailable. An empty Agenda collection does not hide dated Presencial retreats.
+
 ## 5. Registration status
 
 Internal values:
@@ -107,9 +110,13 @@ Stable academic modules live in one static shared source used by Formación/Pres
 
 ## 7. Retreat data
 
-Presencial owns the editable current-edition retreat date/location objects in V1.
+Presencial owns the editable current-edition retreat data in V1, including public title, dates, schedule label, location, summary, external URL and Home eligibility.
 
-Do not create a second independent copy of the same retreat dates elsewhere.
+A Presencial retreat with a valid start date is derived at read time as an ordinary public event with category `retreat`. It participates in Agenda, Home when featured, and Próximos retiros. Past derived retreats follow the same Europe/Madrid civil-date rule as independent events.
+
+Do not create a second independent `event` document for the same training retreat. The Agenda collection owns only independent activities, including independent retreats. No fuzzy title/date deduplication is performed.
+
+The training-specific retreat `note` is not copied into the public event excerpt.
 
 Online retreat participation/dates remain a business-validation point. Do not model separate Online retreat dates until a real difference is confirmed.
 

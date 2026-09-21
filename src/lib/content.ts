@@ -8,8 +8,18 @@ export type DateRange = {
 };
 
 export type RetreatEditionInfo = DateRange & {
+  title?: string;
+  timeLabel?: string;
   location?: string;
+  excerpt?: string;
+  externalUrl?: string;
+  featured: boolean;
   note?: string;
+};
+
+export type TrainingPresencialRetreats = {
+  mainRetreat?: RetreatEditionInfo;
+  followUpRetreat?: RetreatEditionInfo;
 };
 
 export type TrainingModuleKey =
@@ -35,11 +45,10 @@ type TrainingEditionBase = {
   importantNotice?: string;
 };
 
-export type TrainingPresencial = TrainingEditionBase & {
-  locationSummary?: string;
-  mainRetreat?: RetreatEditionInfo;
-  followUpRetreat?: RetreatEditionInfo;
-};
+export type TrainingPresencial = TrainingEditionBase &
+  TrainingPresencialRetreats & {
+    locationSummary?: string;
+  };
 
 export type TrainingOnline = TrainingEditionBase;
 

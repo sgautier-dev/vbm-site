@@ -45,13 +45,52 @@ export function defineRetreatField({
   return defineField({
     name,
     title,
+    description:
+      "Si tiene una fecha de inicio, este retiro aparecerá automáticamente en la Agenda.",
     type: "object",
     fields: [
+      defineField({
+        name: "title",
+        title: "Título público",
+        type: "string",
+      }),
       ...createDateFields(),
+      defineField({
+        name: "timeLabel",
+        title: "Horario",
+        description: "Texto visible únicamente; no modifica la vigencia del retiro.",
+        type: "string",
+      }),
       defineField({
         name: "location",
         title: "Lugar",
         type: "string",
+      }),
+      defineField({
+        name: "excerpt",
+        title: "Resumen",
+        description: "Una presentación breve del retiro, con un máximo de 320 caracteres.",
+        type: "text",
+        rows: 3,
+        validation: (rule) => rule.max(320),
+      }),
+      defineField({
+        name: "externalUrl",
+        title: "Enlace externo",
+        type: "url",
+        validation: (rule) =>
+          rule.uri({
+            allowRelative: false,
+            scheme: ["http", "https"],
+          }),
+      }),
+      defineField({
+        name: "featured",
+        title: "Destacar en portada",
+        description:
+          "Si está activado y el retiro sigue vigente, también podrá aparecer en la portada.",
+        type: "boolean",
+        initialValue: false,
       }),
       defineField({
         name: "note",

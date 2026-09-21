@@ -1,5 +1,3 @@
-import type { Event } from "@/lib/content";
-
 export const VBM_TIME_ZONE = "Europe/Madrid";
 
 const madridDateFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -53,13 +51,6 @@ export function validateDateRange(value: unknown): true | string {
   }
 
   return true;
-}
-
-export function isCurrentOrUpcomingEvent(
-  event: Pick<Event, "startDate" | "endDate">,
-  today = getMadridCivilDate(),
-): boolean {
-  return today <= (event.endDate ?? event.startDate);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
