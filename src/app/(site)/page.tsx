@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import CivilDateRange from "@/components/CivilDateRange";
 import EditorialAreas, { type EditorialArea } from "@/components/EditorialAreas";
 import EditorialSectionHeading from "@/components/EditorialSectionHeading";
+import { eventCategoryLabels } from "@/lib/content-presentation";
+import { getFeaturedUpcomingEvents } from "@/sanity/data";
 
 export const metadata: Metadata = {
   title: { absolute: "Fundación Vivir un Buen Morir" },
@@ -64,7 +67,11 @@ const trainingModes = [
   },
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const eventsResult = await getFeaturedUpcomingEvents();
+  const featuredEvents =
+    eventsResult.status === "available" ? eventsResult.data : [];
+
   return (
     <>
       <section
@@ -178,6 +185,39 @@ export default function HomePage() {
               aprendiendo, compartiendo y reflexionando sobre el cuidado y el final de
               la vida.
             </p>
+            {featuredEvents.length > 0 ? (
+              <ul
+                aria-label="Próximas actividades destacadas"
+                className="mt-8 border-t border-foreground/15"
+              >
+                {featuredEvents.map((event, index) => (
+                  <li
+                    key={`${event.startDate}-${event.title}-${index}`}
+                    className="grid gap-2 border-b border-foreground/15 py-5 sm:grid-cols-[minmax(9rem,2fr)_minmax(0,5fr)] sm:gap-6"
+                  >
+                    <div className="text-sm">
+                      <p className="font-semibold text-action-hover">
+                        {eventCategoryLabels[event.category]}
+                      </p>
+                      <p className="mt-1 text-muted">
+                        <CivilDateRange
+                          startDate={event.startDate}
+                          endDate={event.endDate}
+                        />
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="text-lg leading-snug font-semibold tracking-tight">
+                        {event.title}
+                      </h3>
+                      {event.location ? (
+                        <p className="mt-1 text-sm text-muted">{event.location}</p>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             <Link href="/recursos/agenda/" className="arrow-link mt-7">
               Ver agenda
               <span aria-hidden="true">→</span>

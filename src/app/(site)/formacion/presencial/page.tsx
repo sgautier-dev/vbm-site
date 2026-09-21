@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import EditorialSectionHeading from "@/components/EditorialSectionHeading";
+import TrainingEditionInfo from "@/components/TrainingEditionInfo";
 import TrainingHero from "@/components/TrainingHero";
 import TrainingProgram from "@/components/TrainingProgram";
+import TrainingRetreatInfo from "@/components/TrainingRetreatInfo";
+import { getTrainingPresencial } from "@/sanity/data";
 
 export const metadata: Metadata = {
   title: "Formación presencial",
@@ -11,7 +14,11 @@ export const metadata: Metadata = {
     "La modalidad presencial combina contenidos teórico-prácticos, dinámicas experienciales, trabajo personal y encuentro directo con el grupo y el profesorado.",
 };
 
-export default function InPersonTrainingPage() {
+export default async function InPersonTrainingPage() {
+  const trainingResult = await getTrainingPresencial();
+  const currentEdition =
+    trainingResult.status === "available" ? trainingResult.data : null;
+
   return (
     <>
       <TrainingHero
@@ -19,6 +26,11 @@ export default function InPersonTrainingPage() {
         title="Vivir un Buen Morir y el arte de acompañar"
         body="La modalidad presencial recorre el programa completo combinando contenidos teórico-prácticos, dinámicas experienciales y trabajo personal. El encuentro directo con el grupo y el profesorado forma parte esencial del proceso formativo."
         tone="presencial"
+      />
+
+      <TrainingEditionInfo
+        headingId="presencial-edition-title"
+        result={trainingResult}
       />
 
       <section aria-labelledby="presencial-method-title" className="section-padding">
@@ -58,7 +70,7 @@ export default function InPersonTrainingPage() {
             id="presencial-program-title"
             title="Ocho módulos para comprender y acompañar el proceso de morir"
           />
-          <TrainingProgram />
+          <TrainingProgram moduleDates={currentEdition?.moduleDates} />
         </div>
       </section>
 
@@ -75,6 +87,10 @@ export default function InPersonTrainingPage() {
               comunicación, autoconocimiento y acompañamiento de calidad desde una
               dimensión experiencial.
             </p>
+            <TrainingRetreatInfo
+              mainRetreat={currentEdition?.mainRetreat}
+              followUpRetreat={currentEdition?.followUpRetreat}
+            />
             <Link href="/formacion/retiros/" className="btn-secondary mt-8 bg-background/65">
               Conocer los retiros VBM
             </Link>

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 
 import EditorialSectionHeading from "@/components/EditorialSectionHeading";
+import TrainingEditionInfo from "@/components/TrainingEditionInfo";
 import TrainingHero from "@/components/TrainingHero";
 import TrainingProgram from "@/components/TrainingProgram";
+import { getTrainingOnline } from "@/sanity/data";
 
 export const metadata: Metadata = {
   title: "Formación online",
@@ -16,7 +18,11 @@ const onlineFormat = [
   "Tras cada módulo se proporciona un dosier didáctico con documentos y material audiovisual relacionado.",
 ] as const;
 
-export default function OnlineTrainingPage() {
+export default async function OnlineTrainingPage() {
+  const trainingResult = await getTrainingOnline();
+  const currentEdition =
+    trainingResult.status === "available" ? trainingResult.data : null;
+
   return (
     <>
       <TrainingHero
@@ -24,6 +30,11 @@ export default function OnlineTrainingPage() {
         title="La Formación VBM en directo, desde cualquier lugar"
         body="La modalidad online consta de ocho módulos en formato webinar y se desarrolla en directo. Permite la interacción con los docentes y con el resto de estudiantes, manteniendo el carácter participativo de la Formación VBM."
         tone="online"
+      />
+
+      <TrainingEditionInfo
+        headingId="online-edition-title"
+        result={trainingResult}
       />
 
       <section aria-labelledby="online-format-title" className="section-padding">
@@ -55,7 +66,7 @@ export default function OnlineTrainingPage() {
             id="online-program-title"
             title="Ocho módulos para comprender y acompañar el proceso de morir"
           />
-          <TrainingProgram />
+          <TrainingProgram moduleDates={currentEdition?.moduleDates} />
         </div>
       </section>
 
