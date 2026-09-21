@@ -21,6 +21,8 @@ Ofrecemos una formación integral para comprender el proceso de morir y desarrol
 
 #### Acompañamiento
 
+Acompañar también requiere saber estar: escuchar, respetar los ritmos de cada persona y cultivar una presencia capaz de sostener sin imponer.
+
 #### Divulgación
 
 Creamos espacios de reflexión y diálogo para integrar la muerte y el cuidado en nuestra vida y en nuestra cultura con mayor naturalidad y conciencia.
@@ -102,6 +104,8 @@ Un acompañamiento de calidad no consiste solo en hacer. También requiere saber
 Desarrollamos programas para profesionales sanitarios, cuidadores, voluntariado y personas que desean comprender mejor el proceso de morir y aprender a acompañar con calidad.
 
 #### Acompañamiento
+
+Acompañar también requiere saber estar: escuchar, respetar los ritmos de cada persona y cultivar una presencia capaz de sostener sin imponer.
 
 #### Divulgación
 

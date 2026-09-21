@@ -20,6 +20,8 @@ const actionAreas = [
   },
   {
     title: "Acompañamiento",
+    description:
+      "Acompañar también requiere saber estar: escuchar, respetar los ritmos de cada persona y cultivar una presencia capaz de sostener sin imponer.",
     href: "/acompanamiento/",
     accent: "cyan",
   },

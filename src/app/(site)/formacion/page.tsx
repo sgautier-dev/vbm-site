@@ -152,15 +152,21 @@ export default function TrainingPage() {
         </div>
       </section>
 
-      <nav aria-labelledby="related-training-title" className="section-padding bg-soft-magenta/30">
-        <div className="section-container">
-          <h2 id="related-training-title" className="sr-only">
-            Modalidades de formación
+      <nav
+        aria-labelledby="related-training-title"
+        className="border-t border-border bg-background py-14 sm:py-16"
+      >
+        <div className="section-container grid gap-8 lg:grid-cols-[minmax(14rem,4fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
+          <h2 id="related-training-title" className="heading-section-sans">
+            Elige cómo participar
           </h2>
-          <ul className="grid border-t border-border sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid max-w-3xl border-t border-border sm:grid-cols-2">
             {relatedTrainingRoutes.map((route) => (
-              <li key={route.href} className="border-b border-border sm:odd:pr-5 sm:even:pl-5 lg:px-5 lg:first:pl-0 lg:last:pr-0">
-                <Link href={route.href} className="arrow-link w-full justify-between py-4">
+              <li
+                key={route.href}
+                className="border-b border-border sm:odd:pr-6 sm:even:border-l sm:even:pl-6"
+              >
+                <Link href={route.href} className="arrow-link py-4">
                   {route.label}
                   <span aria-hidden="true">→</span>
                 </Link>

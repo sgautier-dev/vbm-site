@@ -51,7 +51,7 @@ Formación para entidades → `/formacion/entidades/`
 
 The shared program copy is documented under [Shared academic program](#shared-academic-program).
 
-### Modalidades de formación
+### Elige cómo participar
 
 - Formación presencial → `/formacion/presencial/`
 - Formación online → `/formacion/online/`
@@ -107,8 +107,6 @@ The shared program copy is documented under [Shared academic program](#shared-ac
 La participación en directo y la interacción con docentes y grupo sostienen el carácter compartido de la experiencia. El programa académico común mantiene el trabajo reflexivo y personal como parte del aprendizaje.
 
 ## Shared academic program
-
-The disclosure label for every module is: **Ver contenidos**.
 
 ### Módulo 1 — Antropología de la muerte y su diversidad
 
