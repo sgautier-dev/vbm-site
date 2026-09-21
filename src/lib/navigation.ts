@@ -4,9 +4,25 @@ export type NavigationItem = {
   emphasis?: "primary";
 };
 
-export const mainNavigation: readonly NavigationItem[] = [
+export type MainNavigationItem = NavigationItem & {
+  children?: readonly NavigationItem[];
+};
+
+export const trainingNavigation: readonly NavigationItem[] = [
+  { label: "Formación VBM", href: "/formacion/" },
+  { label: "Presencial", href: "/formacion/presencial/" },
+  { label: "Online", href: "/formacion/online/" },
+  { label: "Para entidades", href: "/formacion/entidades/" },
+  { label: "Retiros VBM", href: "/formacion/retiros/" },
+] as const;
+
+export const mainNavigation: readonly MainNavigationItem[] = [
   { label: "Fundación", href: "/fundacion/" },
-  { label: "Formación", href: "/formacion/" },
+  {
+    label: "Formación",
+    href: "/formacion/",
+    children: trainingNavigation,
+  },
   { label: "Acompañamiento", href: "/acompanamiento/" },
   { label: "Recursos", href: "/recursos/" },
   { label: "ZenCare", href: "/zencare/" },
@@ -15,12 +31,7 @@ export const mainNavigation: readonly NavigationItem[] = [
 
 export const footerNavigation = {
   main: mainNavigation,
-  training: [
-    { label: "Presencial", href: "/formacion/presencial/" },
-    { label: "Online", href: "/formacion/online/" },
-    { label: "Entidades", href: "/formacion/entidades/" },
-    { label: "Retiros", href: "/formacion/retiros/" },
-  ],
+  training: trainingNavigation.slice(1),
   resources: [
     { label: "Agenda", href: "/recursos/agenda/" },
     { label: "Artículos", href: "/recursos/articulos/" },

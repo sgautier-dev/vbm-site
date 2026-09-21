@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { mainNavigation, type NavigationItem } from "@/lib/navigation";
+import {
+  mainNavigation,
+  type NavigationItem,
+} from "@/lib/navigation";
 
 const primaryNavigation = mainNavigation.filter(
   (item) => item.emphasis !== "primary",
@@ -34,10 +37,38 @@ function isExactPath(pathname: string, href: NavigationItem["href"]) {
 
 export default function Header() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const desktopTrainingRef = useRef<HTMLDivElement>(null);
+  const desktopTrainingToggleRef = useRef<HTMLButtonElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileTrainingOpen, setMobileTrainingOpen] = useState(false);
+  const [desktopTrainingOpen, setDesktopTrainingOpen] = useState(false);
   const pathname = usePathname();
 
+  useEffect(() => {
+    if (!desktopTrainingOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        event.target instanceof Node &&
+        !desktopTrainingRef.current?.contains(event.target)
+      ) {
+        setDesktopTrainingOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [desktopTrainingOpen]);
+
   function openMobileMenu() {
+    const trainingItem = mainNavigation.find((item) => item.children);
+
+    setDesktopTrainingOpen(false);
+    setMobileTrainingOpen(
+      trainingItem ? isActivePath(pathname, trainingItem.href) : false,
+    );
     dialogRef.current?.showModal();
     setMobileMenuOpen(true);
   }
@@ -59,9 +90,73 @@ export default function Header() {
         <BrandLink />
 
         <div className="hidden items-center gap-5 xl:flex">
-          {primaryNavigation.map((item) => (
-            <NavigationLink key={item.href} item={item} pathname={pathname} />
-          ))}
+          {primaryNavigation.map((item) =>
+            item.children ? (
+              <div
+                key={item.href}
+                ref={desktopTrainingRef}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setDesktopTrainingOpen(false);
+                  }
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" && desktopTrainingOpen) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setDesktopTrainingOpen(false);
+                    desktopTrainingToggleRef.current?.focus();
+                  }
+                }}
+                className="relative flex items-center gap-0.5"
+              >
+                <NavigationLink item={item} pathname={pathname} />
+                <button
+                  ref={desktopTrainingToggleRef}
+                  type="button"
+                  aria-label={
+                    desktopTrainingOpen
+                      ? "Cerrar opciones de Formación"
+                      : "Abrir opciones de Formación"
+                  }
+                  aria-expanded={desktopTrainingOpen}
+                  aria-controls="desktop-training-navigation"
+                  onClick={() => setDesktopTrainingOpen((open) => !open)}
+                  className="inline-flex size-11 items-center justify-center rounded-control text-foreground hover:bg-surface"
+                >
+                  <Chevron open={desktopTrainingOpen} />
+                </button>
+
+                <div
+                  id="desktop-training-navigation"
+                  hidden={!desktopTrainingOpen}
+                  className="absolute top-[calc(100%+0.5rem)] left-0 z-50 w-64 rounded-panel border border-border bg-background p-2 shadow-sm shadow-foreground/10"
+                >
+                  <ul role="list">
+                    {item.children.map((child) => {
+                      const exact = isExactPath(pathname, child.href);
+
+                      return (
+                        <li key={child.href}>
+                          <Link
+                            href={child.href}
+                            aria-current={exact ? "page" : undefined}
+                            data-active={exact ? "true" : undefined}
+                            onClick={() => setDesktopTrainingOpen(false)}
+                            className="flex min-h-11 items-center rounded-control px-3 py-2 text-sm font-semibold text-foreground hover:bg-surface data-[active=true]:bg-soft-magenta/45 data-[active=true]:text-action-hover"
+                          >
+                            {child.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <NavigationLink key={item.href} item={item} pathname={pathname} />
+            ),
+          )}
         </div>
 
         <div className="hidden xl:block">
@@ -102,7 +197,10 @@ export default function Header() {
         ref={dialogRef}
         id="mobile-navigation"
         aria-labelledby="mobile-navigation-title"
-        onClose={() => setMobileMenuOpen(false)}
+        onClose={() => {
+          setMobileMenuOpen(false);
+          setMobileTrainingOpen(false);
+        }}
         className="mobile-menu fixed inset-y-0 right-0 left-auto m-0 h-dvh w-full max-w-sm overflow-y-auto border-0 border-l border-border bg-background p-6 text-foreground shadow-2xl shadow-foreground/10 xl:hidden"
       >
         <div className="flex items-center justify-between gap-4">
@@ -122,6 +220,49 @@ export default function Header() {
           {mainNavigation.map((item) => {
             const active = isActivePath(pathname, item.href);
             const exact = isExactPath(pathname, item.href);
+
+            if (item.children) {
+              return (
+                <div key={item.href}>
+                  <button
+                    type="button"
+                    aria-expanded={mobileTrainingOpen}
+                    aria-controls="mobile-training-navigation"
+                    data-active={active ? "true" : undefined}
+                    onClick={() => setMobileTrainingOpen((open) => !open)}
+                    className="flex min-h-12 w-full items-center justify-between rounded-control px-3 py-2 text-left text-lg font-semibold text-foreground hover:bg-surface data-[active=true]:bg-soft-magenta/45"
+                  >
+                    {item.label}
+                    <Chevron open={mobileTrainingOpen} />
+                  </button>
+
+                  <ul
+                    id="mobile-training-navigation"
+                    hidden={!mobileTrainingOpen}
+                    className="mt-1 ml-3 space-y-1 border-l border-border pl-3"
+                    role="list"
+                  >
+                    {item.children.map((child) => {
+                      const childExact = isExactPath(pathname, child.href);
+
+                      return (
+                        <li key={child.href}>
+                          <Link
+                            href={child.href}
+                            aria-current={childExact ? "page" : undefined}
+                            data-active={childExact ? "true" : undefined}
+                            onClick={closeMobileMenu}
+                            className="flex min-h-11 items-center rounded-control px-3 py-2 text-base font-semibold text-muted hover:bg-surface hover:text-foreground data-[active=true]:bg-surface data-[active=true]:text-action-hover"
+                          >
+                            {child.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            }
 
             return (
               <Link
@@ -181,5 +322,16 @@ function NavigationLink({
     >
       {item.label}
     </Link>
+  );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`block size-2.5 shrink-0 border-r-2 border-b-2 border-current transition-transform ${
+        open ? "-rotate-[135deg]" : "rotate-45"
+      }`}
+    />
   );
 }
