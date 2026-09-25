@@ -26,8 +26,8 @@ const retreatProjection = `{
 export const TRAINING_PRESENCIAL_QUERY = defineQuery(`
   *[
     _type == "trainingPresencial" &&
-    _id == $documentId
-  ][0] {
+    year >= $currentYear
+  ] | order(year asc, editionLabel asc, _createdAt asc) [0...2] {
     editionLabel,
     year,
     registrationStatus,
@@ -45,8 +45,8 @@ export const TRAINING_PRESENCIAL_QUERY = defineQuery(`
 export const TRAINING_ONLINE_QUERY = defineQuery(`
   *[
     _type == "trainingOnline" &&
-    _id == $documentId
-  ][0] {
+    year >= $currentYear
+  ] | order(year asc, editionLabel asc, _createdAt asc) [0...2] {
     editionLabel,
     year,
     registrationStatus,
@@ -81,8 +81,8 @@ export const PUBLIC_EVENTS_QUERY = defineQuery(`
     ${eventProjection},
     "trainingPresencial": *[
       _type == "trainingPresencial" &&
-      _id == $documentId
-    ][0] {
+      (defined(mainRetreat.startDate) || defined(followUpRetreat.startDate))
+    ] {
       mainRetreat ${retreatProjection},
       followUpRetreat ${retreatProjection}
     }

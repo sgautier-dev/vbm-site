@@ -46,7 +46,7 @@ An event leaving the homepage must never be deleted automatically from Sanity.
 
 Time-dependent lists must not rely exclusively on a publish webhook.
 
-Use a caching/revalidation strategy that guarantees a page eventually recalculates after the local date changes even if nobody edits Sanity.
+Published reads use a one-hour revalidation fallback so pages eventually recalculate after local date changes even if nobody edits Sanity. A signed Sanity publication webhook invalidates the corresponding data cache tags immediately. Development reads use no Next data cache and bypass the Sanity CDN.
 
 The exact Next.js caching API must follow the installed Next.js 16.3 documentation.
 
@@ -84,7 +84,7 @@ Expected behavior:
 - "Próximas actividades" can be omitted or use approved generic empty-state copy
 - never show old events as a fallback
 
-A missing Presencial singleton does not make independent Agenda events unavailable. An empty Agenda collection does not hide dated Presencial retreats.
+Missing Presencial editions do not make independent Agenda events unavailable. An empty Agenda collection does not hide dated Presencial retreats.
 
 ## 5. Registration status
 
@@ -102,7 +102,7 @@ Do not render a dead "Inscríbete" button with no URL.
 
 ## 6. Training source of truth
 
-Current edition data comes from the corresponding singleton.
+Training data comes from the corresponding edition collection. Public Presencial and Online pages select published editions with `year >=` the current Europe/Madrid year, ordered by year ascending, maximum two. An empty successful query returns `available` with `[]`. Historical editions remain in Sanity.
 
 Do not duplicate current dates/prices into static page data.
 
@@ -110,9 +110,9 @@ Stable academic modules live in one static shared source used by Formación/Pres
 
 ## 7. Retreat data
 
-Presencial owns the editable current-edition retreat data in V1, including public title, dates, schedule label, location, summary, external URL and Home eligibility.
+Each Presencial edition owns its editable retreat data in V1, including public title, dates, schedule label, location, summary, external URL and Home eligibility.
 
-A Presencial retreat with a valid start date is derived at read time as an ordinary public event with category `retreat`. It participates in Agenda, Home when featured, and Próximos retiros. Past derived retreats follow the same Europe/Madrid civil-date rule as independent events.
+A Presencial retreat with a valid start date is derived at read time as an ordinary public event with category `retreat`. Retreats from all published Presencial editions participate in Agenda, Home when featured, and Próximos retiros. Past derived retreats follow the same Europe/Madrid civil-date rule as independent events.
 
 Do not create a second independent `event` document for the same training retreat. The Agenda collection owns only independent activities, including independent retreats. No fuzzy title/date deduplication is performed.
 

@@ -125,8 +125,8 @@ Before using a Next.js API, follow the generated Next.js rule at the top of this
 
 Exactly three visible editorial entries in V1:
 
-- `trainingPresencial` — singleton
-- `trainingOnline` — singleton
+- `trainingPresencial` — edition collection
+- `trainingOnline` — edition collection
 - `event` — agenda/activity collection
 
 Do not add an announcement/banner document type in V1.
@@ -146,7 +146,7 @@ Do not place these in Sanity in V1:
 - module titles/descriptions
 - testimonials/resources unless a later explicit decision changes the scope
 
-The Studio must be simple and Spanish. Hide unnecessary technical fields and generic singleton creation UI.
+The Studio must be simple and Spanish. Hide unnecessary technical fields and generic content trees.
 
 ## Runtime and fallbacks
 

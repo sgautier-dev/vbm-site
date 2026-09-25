@@ -1,6 +1,9 @@
 import type { StructureResolver } from "sanity/structure";
 
-import { SINGLETON_DOCUMENT_IDS } from "@/sanity/studio/singletons";
+const newestFirst = [
+  { field: "year", direction: "desc" as const },
+  { field: "editionLabel", direction: "asc" as const },
+];
 
 export const studioStructure: StructureResolver = (structure) =>
   structure
@@ -8,26 +11,22 @@ export const studioStructure: StructureResolver = (structure) =>
     .title("Contenido")
     .items([
       structure
-        .listItem()
-        .id("trainingPresencial")
+        .documentTypeListItem("trainingPresencial")
         .title("📚 Formación presencial")
         .child(
           structure
-            .document()
-            .schemaType("trainingPresencial")
-            .documentId(SINGLETON_DOCUMENT_IDS.trainingPresencial)
-            .title("Formación presencial"),
+            .documentTypeList("trainingPresencial")
+            .title("Formación presencial")
+            .defaultOrdering(newestFirst),
         ),
       structure
-        .listItem()
-        .id("trainingOnline")
+        .documentTypeListItem("trainingOnline")
         .title("💻 Formación online")
         .child(
           structure
-            .document()
-            .schemaType("trainingOnline")
-            .documentId(SINGLETON_DOCUMENT_IDS.trainingOnline)
-            .title("Formación online"),
+            .documentTypeList("trainingOnline")
+            .title("Formación online")
+            .defaultOrdering(newestFirst),
         ),
       structure
         .documentTypeListItem("event")

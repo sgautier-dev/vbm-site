@@ -29,11 +29,11 @@ No site settings document.
 
 No visible technical content tree for Mar.
 
-## `trainingPresencial` singleton
+## `trainingPresencial` edition collection
 
 Studio label: **Formación presencial**
 
-One editable document only.
+Each published document represents one Presencial edition. Historical editions remain in Sanity; the public page selects up to two editions from the current Europe/Madrid calendar year onward, ordered by year ascending.
 
 Fields:
 
@@ -57,7 +57,7 @@ type RetreatEditionInfo = DateRange & {
 
 type TrainingPresencial = {
   editionLabel?: string
-  year?: number
+  year: number
   registrationStatus: RegistrationStatus
   registrationUrl?: string
   pricingSummary?: string
@@ -91,16 +91,16 @@ Module titles and descriptions remain static in code.
 
 Do not add accreditation/diploma claims here as a workaround for unvalidated editorial facts.
 
-Presencial owns its current-edition retreats. A retreat with a confirmed start date is read as a public retreat event without creating a separate `event` document. Its `note` remains training-specific and is not used as the public event summary.
+Presencial owns each edition's retreats. Dated retreats from all published Presencial editions can become public events, even when an edition is no longer displayed on the training page. Past retreats are filtered by their own dates. No separate `event` document is created; `note` remains training-specific and is not used as the public event summary.
 
-## `trainingOnline` singleton
+## `trainingOnline` edition collection
 
 Studio label: **Formación online**
 
 ```ts
 type TrainingOnline = {
   editionLabel?: string
-  year?: number
+  year: number
   registrationStatus: RegistrationStatus
   registrationUrl?: string
   pricingSummary?: string
@@ -120,6 +120,8 @@ type TrainingOnline = {
 ```
 
 Online-specific stable methodology remains static.
+
+The Online page uses the same current-year, ascending-order, maximum-two-editions rule as Presencial.
 
 Do not duplicate Presencial retreat dates into Online in V1 without an explicit business decision. If Online participants can access the same retreats, link/reuse the canonical retreat information rather than creating parallel editable dates.
 
@@ -166,9 +168,7 @@ The `event` collection owns independent public activities only. Presencial editi
 
 The Studio should open to a short custom structure, not a generic "Content" list.
 
-Singletons open directly.
-
-Only Agenda offers creating a new document.
+Presencial and Online open year-descending edition lists; editors can create, duplicate and delete editions. Existing documents with former singleton IDs remain valid collection items.
 
 Field labels/help text are Spanish and non-technical.
 
@@ -181,13 +181,12 @@ Retreat fields in Formación presencial explain that a dated retreat appears aut
 
 ## Validation
 
-- sensible edition year range
+- edition year required, integer and within the documented range
 - URLs valid
 - end date not before start date
 - event title required
 - registration status required
 - excerpt length constrained
-- singleton duplication prevented
 
 ## Outside Sanity
 

@@ -36,6 +36,22 @@ export function adaptTrainingOnline(value: unknown): TrainingOnline | null {
   return adaptTrainingEdition(value);
 }
 
+export function adaptTrainingPresencialEditions(value: unknown): TrainingPresencial[] {
+  return Array.isArray(value)
+    ? value
+        .map(adaptTrainingPresencial)
+        .filter((edition): edition is TrainingPresencial => edition !== null)
+    : [];
+}
+
+export function adaptTrainingOnlineEditions(value: unknown): TrainingOnline[] {
+  return Array.isArray(value)
+    ? value
+        .map(adaptTrainingOnline)
+        .filter((edition): edition is TrainingOnline => edition !== null)
+    : [];
+}
+
 export function adaptEvents(value: unknown): VbmEvent[] {
   if (!Array.isArray(value)) {
     return [];
@@ -46,17 +62,19 @@ export function adaptEvents(value: unknown): VbmEvent[] {
 
 export function adaptPublicEventSources(value: unknown): {
   independentEvents: VbmEvent[];
-  trainingRetreats: TrainingPresencialRetreats | null;
+  trainingRetreats: TrainingPresencialRetreats[];
 } {
   if (!isRecord(value)) {
-    return { independentEvents: [], trainingRetreats: null };
+    return { independentEvents: [], trainingRetreats: [] };
   }
 
   return {
     independentEvents: adaptEvents(value.events),
-    trainingRetreats: adaptTrainingPresencialRetreats(
-      value.trainingPresencial,
-    ),
+    trainingRetreats: Array.isArray(value.trainingPresencial)
+      ? value.trainingPresencial
+          .map(adaptTrainingPresencialRetreats)
+          .filter((retreats): retreats is TrainingPresencialRetreats => retreats !== null)
+      : [],
   };
 }
 
@@ -94,11 +112,15 @@ function adaptTrainingEdition(value: unknown): TrainingOnline | null {
   const scheduleNote = optionalString(value.scheduleNote);
   const importantNotice = optionalString(value.importantNotice);
 
+  if (year === undefined) {
+    return null;
+  }
+
   return {
     registrationStatus,
+    year,
     moduleDates: adaptModuleDates(value.moduleDates),
     ...(editionLabel ? { editionLabel } : {}),
-    ...(year ? { year } : {}),
     ...(registrationUrl ? { registrationUrl } : {}),
     ...(pricingSummary ? { pricingSummary } : {}),
     ...(scheduleNote ? { scheduleNote } : {}),

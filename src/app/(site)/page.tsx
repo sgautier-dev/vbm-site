@@ -208,7 +208,21 @@ export default async function HomePage() {
                     </div>
                     <div>
                       <h3 className="text-lg leading-snug font-semibold tracking-tight">
-                        {event.title}
+                        {event.externalUrl ? (
+                          <a
+                            href={event.externalUrl}
+                            className="rounded-sm underline decoration-action/50 underline-offset-4 hover:text-action-hover hover:decoration-action-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action"
+                          >
+                            {event.title}
+                          </a>
+                        ) : (
+                          <Link
+                            href="/recursos/agenda/"
+                            className="rounded-sm underline decoration-action/50 underline-offset-4 hover:text-action-hover hover:decoration-action-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action"
+                          >
+                            {event.title}
+                          </Link>
+                        )}
                       </h3>
                       {event.location ? (
                         <p className="mt-1 text-sm text-muted">{event.location}</p>

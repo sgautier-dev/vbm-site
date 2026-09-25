@@ -36,7 +36,7 @@ export type TrainingModuleDates = Record<TrainingModuleKey, DateRange>;
 
 type TrainingEditionBase = {
   editionLabel?: string;
-  year?: number;
+  year: number;
   registrationStatus: RegistrationStatus;
   registrationUrl?: string;
   pricingSummary?: string;

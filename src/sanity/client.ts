@@ -13,6 +13,6 @@ export function getSanityClient() {
     ...environment,
     apiVersion: SANITY_API_VERSION,
     perspective: "published",
-    useCdn: true,
+    useCdn: false,
   });
 }

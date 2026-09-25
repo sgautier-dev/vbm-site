@@ -10,47 +10,42 @@ type RetreatSource = {
 };
 
 export function deriveTrainingRetreatEvents(
-  trainingRetreats: TrainingPresencialRetreats | null,
+  trainingRetreats: readonly TrainingPresencialRetreats[],
 ): Event[] {
-  if (!trainingRetreats) {
-    return [];
-  }
-
-  const retreatSources: RetreatSource[] = [
-    {
-      retreat: trainingRetreats.mainRetreat,
-      fallbackTitle: "Retiro VBM",
-    },
-    {
-      retreat: trainingRetreats.followUpRetreat,
-      fallbackTitle: "Retiro de seguimiento VBM",
-    },
-  ];
-
-  return retreatSources.flatMap(({ retreat, fallbackTitle }) => {
-    if (!retreat?.startDate) {
-      return [];
-    }
-
-    return [
+  return trainingRetreats.flatMap((edition) => {
+    const retreatSources: RetreatSource[] = [
+      { retreat: edition.mainRetreat, fallbackTitle: "Retiro VBM" },
       {
-        title: retreat.title ?? fallbackTitle,
-        startDate: retreat.startDate,
-        category: "retreat" as const,
-        featured: retreat.featured,
-        ...(retreat.endDate ? { endDate: retreat.endDate } : {}),
-        ...(retreat.timeLabel ? { timeLabel: retreat.timeLabel } : {}),
-        ...(retreat.location ? { location: retreat.location } : {}),
-        ...(retreat.excerpt ? { excerpt: retreat.excerpt } : {}),
-        ...(retreat.externalUrl ? { externalUrl: retreat.externalUrl } : {}),
+        retreat: edition.followUpRetreat,
+        fallbackTitle: "Retiro de seguimiento VBM",
       },
     ];
+
+    return retreatSources.flatMap(({ retreat, fallbackTitle }) => {
+      if (!retreat?.startDate) {
+        return [];
+      }
+
+      return [
+        {
+          title: retreat.title ?? fallbackTitle,
+          startDate: retreat.startDate,
+          category: "retreat" as const,
+          featured: retreat.featured,
+          ...(retreat.endDate ? { endDate: retreat.endDate } : {}),
+          ...(retreat.timeLabel ? { timeLabel: retreat.timeLabel } : {}),
+          ...(retreat.location ? { location: retreat.location } : {}),
+          ...(retreat.excerpt ? { excerpt: retreat.excerpt } : {}),
+          ...(retreat.externalUrl ? { externalUrl: retreat.externalUrl } : {}),
+        },
+      ];
+    });
   });
 }
 
 export function mergeUpcomingEvents(
   independentEvents: readonly Event[],
-  trainingRetreats: TrainingPresencialRetreats | null,
+  trainingRetreats: readonly TrainingPresencialRetreats[],
   today: string,
 ): Event[] {
   return [

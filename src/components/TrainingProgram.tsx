@@ -3,15 +3,24 @@ import type { TrainingModuleDates } from "@/lib/content";
 import { trainingProgram } from "@/lib/training-program";
 
 type TrainingProgramProps = {
-  moduleDates?: TrainingModuleDates;
+  editions?: readonly {
+    year: number;
+    editionLabel?: string;
+    moduleDates: TrainingModuleDates;
+  }[];
 };
 
-export default function TrainingProgram({ moduleDates }: TrainingProgramProps) {
+export default function TrainingProgram({ editions = [] }: TrainingProgramProps) {
   return (
     <ol className="mt-12 border-y border-border">
       {trainingProgram.map((module) => {
-        const dates = moduleDates?.[module.id];
-        const hasDates = Boolean(dates?.startDate || dates?.endDate);
+        const datedEditions = editions
+          .map((edition, index) => ({
+            edition,
+            index,
+            dates: edition.moduleDates[module.id],
+          }))
+          .filter(({ dates }) => dates.startDate || dates.endDate);
 
         return (
           <li
@@ -30,14 +39,27 @@ export default function TrainingProgram({ moduleDates }: TrainingProgramProps) {
                 <h3 className="mt-2 text-xl leading-snug font-semibold tracking-tight sm:text-2xl">
                   {module.title}
                 </h3>
-                {hasDates ? (
-                  <p className="mt-4 text-sm text-muted">
-                    <span className="font-semibold">Fechas · </span>
-                    <CivilDateRange
-                      startDate={dates?.startDate}
-                      endDate={dates?.endDate}
-                    />
-                  </p>
+                {datedEditions.length > 0 ? (
+                  <ul className="mt-4 space-y-2 text-sm text-muted">
+                    {datedEditions.map(({ edition, index, dates }) => {
+                      const sameYear = editions.filter(
+                        (candidate) => candidate.year === edition.year,
+                      ).length > 1;
+                      const editionName = sameYear
+                        ? edition.editionLabel ?? `${edition.year} · edición ${index + 1}`
+                        : edition.year;
+
+                      return (
+                        <li key={`${edition.year}-${index}`}>
+                          <span className="font-semibold">{editionName} · </span>
+                          <CivilDateRange
+                            startDate={dates.startDate}
+                            endDate={dates.endDate}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
                 ) : null}
               </div>
             </div>

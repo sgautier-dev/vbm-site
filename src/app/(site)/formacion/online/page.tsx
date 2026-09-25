@@ -4,7 +4,7 @@ import EditorialSectionHeading from "@/components/EditorialSectionHeading";
 import TrainingEditionInfo from "@/components/TrainingEditionInfo";
 import TrainingHero from "@/components/TrainingHero";
 import TrainingProgram from "@/components/TrainingProgram";
-import { getTrainingOnline } from "@/sanity/data";
+import { getTrainingOnlineEditions } from "@/sanity/data";
 
 export const metadata: Metadata = {
   title: "Formación online",
@@ -19,9 +19,8 @@ const onlineFormat = [
 ] as const;
 
 export default async function OnlineTrainingPage() {
-  const trainingResult = await getTrainingOnline();
-  const currentEdition =
-    trainingResult.status === "available" ? trainingResult.data : null;
+  const trainingResult = await getTrainingOnlineEditions();
+  const editions = trainingResult.status === "available" ? trainingResult.data : [];
 
   return (
     <>
@@ -66,7 +65,7 @@ export default async function OnlineTrainingPage() {
             id="online-program-title"
             title="Ocho módulos para comprender y acompañar el proceso de morir"
           />
-          <TrainingProgram moduleDates={currentEdition?.moduleDates} />
+          <TrainingProgram editions={editions} />
         </div>
       </section>
 

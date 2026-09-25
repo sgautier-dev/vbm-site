@@ -14,6 +14,45 @@ const registrationStatusLabels: Record<RegistrationStatus, string> = {
   closed: "Cerrada",
 };
 
+export function trainingEditionPreview(modality: "Presencial" | "Online") {
+  return {
+    select: {
+      title: "editionLabel",
+      year: "year",
+      status: "registrationStatus",
+    },
+    prepare({
+      title,
+      year,
+      status,
+    }: {
+      title?: string;
+      year?: number;
+      status?: RegistrationStatus;
+    }) {
+      return {
+        title:
+          title?.trim() ||
+          (year ? `Formación VBM ${modality} — ${year}` : `Formación VBM ${modality}`),
+        subtitle: [year, status ? registrationStatusLabels[status] : undefined]
+          .filter(Boolean)
+          .join(" · "),
+      };
+    },
+  };
+}
+
+export const trainingEditionOrderings = [
+  {
+    title: "Año (más reciente primero)",
+    name: "yearDesc",
+    by: [
+      { field: "year", direction: "desc" as const },
+      { field: "editionLabel", direction: "asc" as const },
+    ],
+  },
+];
+
 export const trainingEditionDetailsFields = [
   defineField({
     name: "editionLabel",
@@ -25,7 +64,7 @@ export const trainingEditionDetailsFields = [
     name: "year",
     title: "Año",
     type: "number",
-    validation: (rule) => rule.integer().min(2000).max(2100),
+    validation: (rule) => rule.required().integer().min(2000).max(2100),
   }),
   defineField({
     name: "registrationStatus",

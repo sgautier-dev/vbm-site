@@ -3,6 +3,8 @@ import { defineField, defineType } from "sanity";
 import { defineRetreatField } from "@/sanity/schemaTypes/dateRange";
 import {
   importantNoticeField,
+  trainingEditionOrderings,
+  trainingEditionPreview,
   trainingEditionDetailsFields,
   trainingScheduleFields,
 } from "@/sanity/schemaTypes/trainingFields";
@@ -12,6 +14,8 @@ export const trainingPresencialType = defineType({
   title: "Formación presencial",
   type: "document",
   description: "Se mostrará automáticamente en la página de formación presencial.",
+  orderings: trainingEditionOrderings,
+  preview: trainingEditionPreview("Presencial"),
   fields: [
     ...trainingEditionDetailsFields,
     defineField({

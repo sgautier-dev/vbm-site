@@ -6,7 +6,7 @@ import TrainingEditionInfo from "@/components/TrainingEditionInfo";
 import TrainingHero from "@/components/TrainingHero";
 import TrainingProgram from "@/components/TrainingProgram";
 import TrainingRetreatInfo from "@/components/TrainingRetreatInfo";
-import { getTrainingPresencial } from "@/sanity/data";
+import { getTrainingPresencialEditions } from "@/sanity/data";
 
 export const metadata: Metadata = {
   title: "Formación presencial",
@@ -15,9 +15,8 @@ export const metadata: Metadata = {
 };
 
 export default async function InPersonTrainingPage() {
-  const trainingResult = await getTrainingPresencial();
-  const currentEdition =
-    trainingResult.status === "available" ? trainingResult.data : null;
+  const trainingResult = await getTrainingPresencialEditions();
+  const editions = trainingResult.status === "available" ? trainingResult.data : [];
 
   return (
     <>
@@ -70,7 +69,7 @@ export default async function InPersonTrainingPage() {
             id="presencial-program-title"
             title="Ocho módulos para comprender y acompañar el proceso de morir"
           />
-          <TrainingProgram moduleDates={currentEdition?.moduleDates} />
+          <TrainingProgram editions={editions} />
         </div>
       </section>
 
@@ -87,10 +86,7 @@ export default async function InPersonTrainingPage() {
               comunicación, autoconocimiento y acompañamiento de calidad desde una
               dimensión experiencial.
             </p>
-            <TrainingRetreatInfo
-              mainRetreat={currentEdition?.mainRetreat}
-              followUpRetreat={currentEdition?.followUpRetreat}
-            />
+            <TrainingRetreatInfo editions={editions} />
             <Link href="/formacion/retiros/" className="btn-secondary mt-8 bg-background/65">
               Conocer los retiros VBM
             </Link>

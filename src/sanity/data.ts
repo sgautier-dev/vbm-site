@@ -10,36 +10,38 @@ import {
 } from "@/lib/events";
 import {
   adaptPublicEventSources,
-  adaptTrainingOnline,
-  adaptTrainingPresencial,
+  adaptTrainingOnlineEditions,
+  adaptTrainingPresencialEditions,
 } from "@/sanity/adapters";
 import { getSanityClient } from "@/sanity/client";
-import { getMadridCivilDate } from "@/sanity/date";
+import { SANITY_CACHE_TAGS } from "@/sanity/cache-tags";
+import { getMadridCivilDate, getMadridYear } from "@/sanity/date";
 import { SANITY_REVALIDATE_SECONDS } from "@/sanity/env";
 import {
   PUBLIC_EVENTS_QUERY,
   TRAINING_ONLINE_QUERY,
   TRAINING_PRESENCIAL_QUERY,
 } from "@/sanity/queries";
-import { SINGLETON_DOCUMENT_IDS } from "@/sanity/studio/singletons";
 
-export async function getTrainingPresencial(): Promise<
-  ContentResult<TrainingPresencial | null>
+export async function getTrainingPresencialEditions(): Promise<
+  ContentResult<TrainingPresencial[]>
 > {
   return fetchSanityContent(
     TRAINING_PRESENCIAL_QUERY,
-    { documentId: SINGLETON_DOCUMENT_IDS.trainingPresencial },
-    adaptTrainingPresencial,
+    { currentYear: getMadridYear() },
+    adaptTrainingPresencialEditions,
+    SANITY_CACHE_TAGS.trainingPresencial,
   );
 }
 
-export async function getTrainingOnline(): Promise<
-  ContentResult<TrainingOnline | null>
+export async function getTrainingOnlineEditions(): Promise<
+  ContentResult<TrainingOnline[]>
 > {
   return fetchSanityContent(
     TRAINING_ONLINE_QUERY,
-    { documentId: SINGLETON_DOCUMENT_IDS.trainingOnline },
-    adaptTrainingOnline,
+    { currentYear: getMadridYear() },
+    adaptTrainingOnlineEditions,
+    SANITY_CACHE_TAGS.trainingOnline,
   );
 }
 
@@ -67,10 +69,7 @@ async function getPublicEvents(): Promise<ContentResult<VbmEvent[]>> {
 
   return fetchSanityContent(
     PUBLIC_EVENTS_QUERY,
-    {
-      today,
-      documentId: SINGLETON_DOCUMENT_IDS.trainingPresencial,
-    },
+    { today },
     (value) => {
       const sources = adaptPublicEventSources(value);
 
@@ -80,13 +79,15 @@ async function getPublicEvents(): Promise<ContentResult<VbmEvent[]>> {
         today,
       );
     },
+    SANITY_CACHE_TAGS.events,
   );
 }
 
 async function fetchSanityContent<T>(
   query: string,
-  params: Record<string, string>,
+  params: Record<string, string | number>,
   adapt: (value: unknown) => T,
+  tag: string,
 ): Promise<ContentResult<T>> {
   const client = getSanityClient();
 
@@ -95,9 +96,13 @@ async function fetchSanityContent<T>(
   }
 
   try {
-    const value = await client.fetch<unknown>(query, params, {
-      next: { revalidate: SANITY_REVALIDATE_SECONDS },
-    });
+    const value = await client.fetch<unknown>(
+      query,
+      params,
+      process.env.NODE_ENV === "development"
+        ? { cache: "no-store" }
+        : { next: { revalidate: SANITY_REVALIDATE_SECONDS, tags: [tag] } },
+    );
 
     return { status: "available", data: adapt(value) };
   } catch (error) {

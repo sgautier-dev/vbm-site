@@ -20,6 +20,10 @@ export function getMadridCivilDate(now = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
+export function getMadridYear(now = new Date()): number {
+  return Number(getMadridCivilDate(now).slice(0, 4));
+}
+
 export function isCivilDate(value: unknown): value is string {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return false;
